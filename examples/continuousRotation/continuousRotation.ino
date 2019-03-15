@@ -2,7 +2,6 @@
 
 AS5600 encoder;
 
-unsigned long tim = 0;
 long enc, lenc = 0;
 
 void setup()
