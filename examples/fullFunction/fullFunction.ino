@@ -14,6 +14,14 @@ AMS5600 Programming Sketch
 #include <Wire.h>
 #include "AS5600.h"
 
+#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
+  #define SERIAL SerialUSB
+  #define SYS_VOL   3.3
+#else
+  #define SERIAL Serial
+  #define SYS_VOL   5
+#endif
+
 String lastResponse;
 String noMagnetStr = "Error: magnet not detected";
 
@@ -26,7 +34,7 @@ AMS_5600 ams5600;
 /* Description: called by system at startup
 /*******************************************************/
 void setup(){
- Serial.begin(115200);
+ SERIAL.begin(115200);
  Wire.begin();
  printMenu();
 }
@@ -41,23 +49,23 @@ void setup(){
 void printMenu()
 {
   for(int i =0; i<20;i++)
-    Serial.println();
-  Serial.println("AS5600 Serial Interface Program");
-  Serial.println("");
+    SERIAL.println();
+  SERIAL.println("AS5600 SERIAL Interface Program");
+  SERIAL.println("");
   if(lastResponse.length()>0)
   {
-    Serial.println(lastResponse);
-    Serial.println("");
+    SERIAL.println(lastResponse);
+    SERIAL.println("");
   }
-  Serial.print("1 - Set start position\t|  "); Serial.println(" 6 - get MPOS");
-  Serial.print("2 - Set end position\t|  ");   Serial.println(" 7 - get raw angle");
-  Serial.print("3 - Set max angle range\t|  ");  Serial.println(" 8 - get scaled angle");
-  Serial.print("4 - Get max angle range\t|  ");  Serial.println(" 9 - detect magnet");
-  Serial.print("5 - Get ZPOS \t\t|  ");     Serial.println("10 - get magnet strength");
-  Serial.println();
-  Serial.print("Number of burns remaining: "); Serial.println(String(3 - ams5600.getBurnCount()));
-  Serial.println("96 - Burn Angle");
-  Serial.println("98 - Burn Settings (one time)");
+  SERIAL.print("1 - Set start position\t|  "); SERIAL.println(" 6 - get end position");
+  SERIAL.print("2 - Set end position\t|  ");   SERIAL.println(" 7 - get raw angle");
+  SERIAL.print("3 - Set max angle range\t|  ");  SERIAL.println(" 8 - get scaled angle");
+  SERIAL.print("4 - Get max angle range\t|  ");  SERIAL.println(" 9 - detect magnet");
+  SERIAL.print("5 - Get start position \t\t|  ");     SERIAL.println("10 - get magnet strength");
+  SERIAL.println();
+  SERIAL.print("Number of burns remaining: "); SERIAL.println(String(3 - ams5600.getBurnCount()));
+  SERIAL.println("96 - Burn Angle");
+  SERIAL.println("98 - Burn Settings (one time)");
 }
 
 /*******************************************************
@@ -182,7 +190,7 @@ String burnMaxAngleAndConfig()
 void loop()
 {
 
-  if (Serial.available() > 0)
+  if (SERIAL.available() > 0)
   {
     char incomingByteBuffer[2];
     char incomingByte;
@@ -190,7 +198,7 @@ void loop()
     incomingByteBuffer[0] = NULL;
     incomingByteBuffer[1] = NULL;
 
-    Serial.readBytes(incomingByteBuffer,2);
+    SERIAL.readBytes(incomingByteBuffer,2);
 
     if ((incomingByteBuffer[0] >= 48) && (incomingByteBuffer[0] < 60))
     {
@@ -283,8 +291,8 @@ void loop()
             lastResponse += "is weak";
           else if(magStrength == 2){
             lastResponse += "is acceptable";
-            Serial.print("Current Magnitude: ");
-            Serial.println(ams5600.getMagnitude());
+            SERIAL.print("Current Magnitude: ");
+            SERIAL.println(ams5600.getMagnitude());
           }
           else if (magStrength == 3)
             lastResponse += "is to strong";
@@ -296,11 +304,11 @@ void loop()
 
       case 96:
       {
-        Serial.println ("BURN ANGLE (Y/N)?");
+        SERIAL.println ("BURN ANGLE (Y/N)?");
 
         char answer;
 
-        Serial.readBytes(&answer,1);
+        SERIAL.readBytes(&answer,1);
 
         if((answer == 'y') || (answer == 'Y'))
         {
@@ -313,9 +321,9 @@ void loop()
 
       case 98:
       {
-        Serial.println ("BURN MAX ANGLE AND CONFIG (Y/N)?");
+        SERIAL.println ("BURN MAX ANGLE AND CONFIG (Y/N)?");
 
-        char answer = Serial.read();
+        char answer = SERIAL.read();
 
         if((answer == 'y') || (answer == 'Y'))
         {
