@@ -1,50 +1,82 @@
-#ifndef _AS5600_H_
-#define _AS5600_H_
+/****************************************************
+/* AMS 5600 class for Arduino platform
+/* Author: Tom Denton
+/* Date: 15 Dec 2014
+/* File: AMS_5600.h 
+/* Version 1.00
+/* www.ams.com
+/*  
+/* Description:  This class has been designed to
+/* access the AMS 5600 “potuino” shield.
+/*
+/***************************************************/
 
-#include "Arduino.h"
-#include <Wire.h>
+#ifndef AMS_5600_h
+#define AMS_5600_h
 
-#define _AS5600_CPR 4096
-#define _AS5600_CPR_HALF 2048
+#include <Arduino.h>
 
-#define _AS5600_ADDR 0x36
-
-#define _ZMCOAddress 0x00
-#define _ZPOSAddressMSB 0x01
-#define _ZPOSAddressLSB 0x02
-#define _MPOSAddressMSB 0x03
-#define _MPOSAddressLSB 0x04
-#define _MANGAddressMSB 0x05
-#define _MANGAddressLSB 0x06
-#define _CONFAddressMSB 0x07
-#define _CONFAddressLSB 0x08
-#define _RAWANGLEAddressMSB 0x0C
-#define _RAWANGLEAddressLSB 0x0D
-#define _ANGLEAddressMSB 0x0E
-#define _ANGLEAddressLSB 0x0F
-#define _STATUSAddress 0x0B
-#define _AGCAddress 0x1A
-#define _MAGNITUDEAddressMSB 0x1B
-#define _MAGNITUDEAddressLSB 0x1C
-#define _BURNAddress 0xFF
-
-class AS5600
+class AMS_5600
 {
   public:
-    AS5600();
-    long getPosition();
-    int getAngle();
-    int getStatus();
-    void setZero();
-
+    
+    AMS_5600(void);
+    int getAddress();       
+    
+    word setMaxAngle(word newMaxAngle = -1);
+    word getMaxAngle();
+    
+    word setStartPosition(word startAngle = -1);
+    word getStartPosition();
+    
+    word setEndPosition(word endAngle = -1);
+    word getEndPosition();
+    
+    word getRawAngle();
+    word getScaledAngle();
+    
+    int  detectMagnet();
+    int  getMagnetStrength();
+    int  getAgc();
+    word getMagnitude();
+    
+    int  getBurnCount();
+    int  burnAngle();
+    int  burnMaxAngleAndConfig();
+    
   private:
-    long output, last_output;
-    int revolutions, offset, first;
-
-    long _msb;
-    long _lsb;
-    long _getRegisters2(byte registerMSB, byte registerLSB);
-    int _getRegister(byte register1);
+  
+    int _ams5600_Address;
+      
+    word _rawStartAngle;
+    word _zPosition;
+    word _rawEndAngle;
+    word _mPosition;
+    word _maxAngle;
+    
+    /* Registers */
+    int _zmco;
+    int _zpos_hi;    /*zpos[11:8] high nibble  START POSITION */
+    int _zpos_lo;    /*zpos[7:0] */
+    int _mpos_hi;    /*mpos[11:8] high nibble  STOP POSITION */
+    int _mpos_lo;    /*mpos[7:0] */
+    int _mang_hi;    /*mang[11:8] high nibble  MAXIMUM ANGLE */
+    int _mang_lo;    /*mang[7:0] */
+    int _conf_hi;    
+    int _conf_lo;
+    int _raw_ang_hi;
+    int _raw_ang_lo;
+    int _ang_hi;
+    int _ang_lo;
+    int _stat;
+    int _agc;
+    int _mag_hi;
+    int _mag_lo;
+    int _burn;
+    
+    int readOneByte(int in_adr);
+    word readTwoBytes(int in_adr_hi, int in_adr_lo);
+    void writeOneByte(int adr_in, int dat_in);
+   
 };
-
 #endif
