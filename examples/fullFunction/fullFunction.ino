@@ -192,8 +192,8 @@ void loop()
 
   if (SERIAL.available() > 0)
   {
-    char incomingByteBuffer[2];
-    char incomingByte;
+    char incomingByteBuffer[2] = {0};
+    char incomingByte = 0;
 
     incomingByteBuffer[0] = NULL;
     incomingByteBuffer[1] = NULL;
