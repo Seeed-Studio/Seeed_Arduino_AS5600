@@ -1,3 +1,4 @@
+
 /****************************************************
 /* AMS 5600 class for Arduino platform
 /* Author: Tom Denton
@@ -47,7 +48,17 @@ AMS_5600::AMS_5600()
   _mag_lo = 0x1c;
   _burn = 0xff;
 }
-
+/* mode = 0, output PWM, mode = 1 output analog (full range from 0% to 100% between GND and VDD*/
+void AMS_5600::setOutPut(uint8_t mode){
+    uint8_t config_status;
+    config_status = readOneByte(_conf_lo);
+    if(mode == 1){
+        config_status = config_status & 0xcf;
+    }else{
+        config_status = config_status & 0xef;
+    }
+    writeOneByte(_conf_lo, lowByte(config_status)); 
+}
 /****************************************************
 /* Method: AMS_5600
 /* In: none

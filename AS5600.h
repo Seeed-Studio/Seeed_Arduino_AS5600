@@ -1,3 +1,4 @@
+
 /****************************************************
 /* AMS 5600 class for Arduino platform
 /* Author: Tom Denton
@@ -43,6 +44,7 @@ class AMS_5600
     int  getBurnCount();
     int  burnAngle();
     int  burnMaxAngleAndConfig();
+    void setOutPut(uint8_t mode);
     
   private:
   
@@ -77,6 +79,7 @@ class AMS_5600
     int readOneByte(int in_adr);
     word readTwoBytes(int in_adr_hi, int in_adr_lo);
     void writeOneByte(int adr_in, int dat_in);
+
    
 };
 #endif
