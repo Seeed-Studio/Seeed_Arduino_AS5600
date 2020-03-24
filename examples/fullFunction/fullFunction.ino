@@ -192,7 +192,7 @@ void loop()
 
   if (SERIAL.available() > 0)
   {
-    char incomingByteBuffer[2] = {0};
+    char incomingByteBuffer[5] = {0};
     char incomingByte = 0;
 
     incomingByteBuffer[0] = NULL;
@@ -304,33 +304,13 @@ void loop()
 
       case 96:
       {
-        SERIAL.println ("BURN ANGLE (Y/N)?");
-
-        char answer;
-
-        SERIAL.readBytes(&answer,1);
-
-        if((answer == 'y') || (answer == 'Y'))
-        {
           lastResponse = burnAngle();
-        }
-        else
-          lastResponse = "Brun canceled";
       }
       break;
 
       case 98:
       {
-        SERIAL.println ("BURN MAX ANGLE AND CONFIG (Y/N)?");
-
-        char answer = SERIAL.read();
-
-        if((answer == 'y') || (answer == 'Y'))
-        {
           lastResponse = burnMaxAngleAndConfig();
-        }
-        else
-          lastResponse = "Brun canceled";
       }
       break;
 
