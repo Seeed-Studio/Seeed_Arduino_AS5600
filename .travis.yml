@@ -1,0 +1,32 @@
+language: generic
+matrix:
+  include:
+    - env:
+        - BOARD="arduino:avr:uno"
+      install:
+        - arduino-cli core update-index
+        - arduino-cli core install arduino:avr
+    - env:
+        - BOARD="Seeeduino:samd:seeed_XIAO_m0"
+      install:
+        - arduino-cli core update-index --additional-urls http://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+        - arduino-cli core install Seeeduino:samd --additional-urls http://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+# default phases
+before_install:
+  - mkdir -p "$HOME/bin"
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR="$HOME/bin" sh
+  - export PATH="$PATH:$HOME/bin"
+  - buildExampleSketch() { arduino-cli compile  --warnings all --fqbn $BOARD $PWD/examples/$1 --verbose; }
+  - buildExampleUtilitySketch() { arduino-cli compile --warnings all --fqbn $BOARD $PWD/examples/utility/$1 --verbose; }
+  - mkdir -p "$HOME/Arduino/libraries"
+  - ln -s "$PWD" "$HOME/Arduino/libraries/."
+script:
+  - buildExampleSketch fullFunction
+  - buildExampleSketch readAngle
+  - buildExampleSketch resultoutput
+notifications:
+  webhooks:
+    urls:
+      - https://www.travisbuddy.com/
+    on_success: never
+    on_failure: always
