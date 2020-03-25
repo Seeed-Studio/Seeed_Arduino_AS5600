@@ -1,4 +1,4 @@
-# AS5600
+# AS5600 [![Build Status](https://travis-ci.com/Seeed-Studio/Seeed_Arduino_AS5600.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Seeed_Arduino_AS5600)
 AS5600 12-bits Absolute Magnetic Encoder
 
 Features:
