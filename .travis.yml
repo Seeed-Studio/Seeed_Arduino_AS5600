@@ -1,5 +1,6 @@
 
 language: generic
+dist: bionic
 sudo: false
 cache:
   directories:
