@@ -23,12 +23,12 @@
 /***************************************************/
 AMS_5600::AMS_5600()
 {
-  set i2c address * /
-      _ams5600_Address = 0x36;
+  /* set i2c address */
+  _ams5600_Address = 0x36;
 
-  load register values * /
-      c++ class forbids pre loading of variables * /
-      _zmco = 0x00;
+  /* load register values */
+  /* c++ class forbids pre loading of variables */
+  _zmco = 0x00;
   _zpos_hi = 0x01;
   _zpos_lo = 0x02;
   _mpos_hi = 0x03;
