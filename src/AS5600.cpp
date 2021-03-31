@@ -9,7 +9,7 @@
    
   Description:  This class has been designed to
   access the AMS 5600 “potuino” shield.
-/***************************************************/
+*****************************************************/
 
 #include "Arduino.h"
 #include "AS5600.h"
@@ -20,7 +20,7 @@
   In: none
   Out: none
   Description: constructor class for AMS 5600
-/***************************************************/
+*****************************************************/
 AMS_5600::AMS_5600()
 {
   /* set i2c address */
@@ -76,7 +76,7 @@ void AMS_5600::setOutPut(uint8_t mode)
   In: none
   Out: i2c address of AMS 5600
   Description: returns i2c address of AMS 5600
-/***************************************************/
+****************************************************/
 int AMS_5600::getAddress()
 {
   return _ams5600_Address;
