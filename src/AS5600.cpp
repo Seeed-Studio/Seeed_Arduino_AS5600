@@ -47,7 +47,7 @@ AMS_5600::AMS_5600()
   _mag_lo = 0x1c;
   _burn = 0xff;
 }
-/* mode = 0, output PWM, mode = 1 output analog (full range from 0% to 100% between GND and VDD*/
+/* mode = 0, output PWM, mode = 1 output analog (full range from 0% to 100% between GND and VDD */
 void AMS_5600::setOutPut(uint8_t mode)
 {
   uint8_t config_status;
