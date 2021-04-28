@@ -38,6 +38,8 @@ public:
   int getMagnetStrength();
   int getAgc();
   word getMagnitude();
+  word getConf();
+  void setConf(word _conf);
 
   int getBurnCount();
   int burnAngle();

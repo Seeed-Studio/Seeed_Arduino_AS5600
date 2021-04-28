@@ -295,6 +295,31 @@ word AMS_5600::getMagnitude()
 }
 
 /*******************************************************
+  Method: getConf
+  In: none
+  Out: value of CONF register 
+  Description: gets value of CONF register.
+*******************************************************/
+word AMS_5600::getConf()
+{
+  return readTwoBytes(_conf_hi, _conf_lo);
+}
+
+/*******************************************************
+  Method: setConf
+  In: value of CONF register
+  Out: none
+  Description: sets value of CONF register.
+*******************************************************/
+void AMS_5600::setConf(word _conf)
+{
+  writeOneByte(_conf_hi, highByte(_conf));
+  delay(2);
+  writeOneByte(_conf_lo, lowByte(_conf));
+  delay(2);
+}
+
+/*******************************************************
   Method: getBurnCount
   In: none
   Out: value of zmco register
@@ -406,7 +431,7 @@ word AMS_5600::readTwoBytes(int in_adr_hi, int in_adr_lo)
   while (Wire.available() == 0)
     ;
   int low = Wire.read();
-
+  
   /* Read High Byte */
   Wire.beginTransmission(_ams5600_Address);
   Wire.write(in_adr_hi);
@@ -417,7 +442,7 @@ word AMS_5600::readTwoBytes(int in_adr_hi, int in_adr_lo)
     ;
 
   word high = Wire.read();
-
+  
   high = high << 8;
   retVal = high | low;
 
