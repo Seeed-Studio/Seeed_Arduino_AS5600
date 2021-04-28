@@ -463,6 +463,4 @@ void AMS_5600::writeOneByte(int adr_in, int dat_in)
   Wire.endTransmission();
 }
 
-
-
 /**********  END OF AMS 5600 CALSS *****************/
