@@ -432,7 +432,6 @@ word AMS_5600::readTwoBytes(int in_adr_hi, int in_adr_lo)
     ;
   int low = Wire.read();
   
-
   /* Read High Byte */
   Wire.beginTransmission(_ams5600_Address);
   Wire.write(in_adr_hi);
