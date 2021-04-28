@@ -22,6 +22,8 @@ detectMagnet	KEYWORD2
 getMagnetStrength	KEYWORD2
 getAgc  	KEYWORD2
 getMagnitude		KEYWORD2
+getConf		KEYWORD2
+setConf		KEYWORD2
 getBurnCount		KEYWORD2
 burnAngle		KEYWORD2
 burnMaxAngleAndConfig		KEYWORD2
