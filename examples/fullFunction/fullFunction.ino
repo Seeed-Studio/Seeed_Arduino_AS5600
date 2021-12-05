@@ -57,11 +57,12 @@ void printMenu()
     SERIAL.println(lastResponse);
     SERIAL.println("");
   }
-  SERIAL.print("1 - Set start position\t|  "); SERIAL.println(" 6 - get end position");
-  SERIAL.print("2 - Set end position\t|  ");   SERIAL.println(" 7 - get raw angle");
-  SERIAL.print("3 - Set max angle range\t|  ");  SERIAL.println(" 8 - get scaled angle");
-  SERIAL.print("4 - Get max angle range\t|  ");  SERIAL.println(" 9 - detect magnet");
-  SERIAL.print("5 - Get start position \t\t|  ");     SERIAL.println("10 - get magnet strength");
+  SERIAL.print("1 - Set start position\t|  "); SERIAL.println(" 7 - get raw angle");
+  SERIAL.print("2 - Set end position\t|  ");   SERIAL.println(" 8 - get scaled angle");
+  SERIAL.print("3 - Set max angle range\t|  ");  SERIAL.println(" 9 - detect magnet");
+  SERIAL.print("4 - Get max angle range\t|  ");  SERIAL.println("10 - get magnet strength");
+  SERIAL.print("5 - Get start position \t|  ");     SERIAL.println("11 - get automatic gain conrol");
+  SERIAL.println("6 - get end position \t|  ");
   SERIAL.println();
   SERIAL.print("Number of burns remaining: "); SERIAL.println(String(3 - ams5600.getBurnCount()));
   SERIAL.println("96 - Burn Angle");
@@ -128,12 +129,12 @@ float convertScaledAngleToDegrees(word newAngle)
 String burnAngle()
 {
   int burnResult = ams5600.burnAngle();
-  String returnStr = "Brun angle error: ";
+  String returnStr = "Burn angle error: ";
 
   switch (burnResult)
   {
     case 1:
-      returnStr = "Brun angle success";
+      returnStr = "Burn angle success";
       break;
     case -1:
       returnStr += "no magnet detected";
@@ -161,12 +162,12 @@ String burnAngle()
 String burnMaxAngleAndConfig()
 {
   int burnResult = ams5600.burnMaxAngleAndConfig();
-  String retStr = "Brun max angle and config error: ";
+  String retStr = "Burn max angle and config error: ";
 
   switch(burnResult)
   {
     case 1:
-      retStr = "Brun max angle and config success";
+      retStr = "Burn max angle and config success";
       break;
     case -1:
       retStr += "chip has been burned once already";
@@ -290,15 +291,21 @@ void loop()
           if(magStrength == 1)
             lastResponse += "is weak";
           else if(magStrength == 2){
-            lastResponse += "is acceptable";
-            SERIAL.print("Current Magnitude: ");
-            SERIAL.println(ams5600.getMagnitude());
+            lastResponse += "is acceptable. ";
+            lastResponse += "Current Magnitude: ";
+            lastResponse += ams5600.getMagnitude();
           }
           else if (magStrength == 3)
             lastResponse += "is to strong";
         }
         else
           lastResponse = noMagnetStr;
+      }
+      break;
+
+      case 11:
+      {
+         lastResponse = "Automatic Gain Control = " + String(ams5600.getAgc(),DEC);
       }
       break;
 
