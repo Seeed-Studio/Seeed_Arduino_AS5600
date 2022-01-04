@@ -421,32 +421,17 @@ int AMS_5600::readOneByte(int in_adr)
 *******************************************************/
 word AMS_5600::readTwoBytes(int in_adr_hi, int in_adr_lo)
 {
-  word retVal = -1;
-
-  /* Read Low Byte */
-  Wire.beginTransmission(_ams5600_Address);
-  Wire.write(in_adr_lo);
-  Wire.endTransmission();
-  Wire.requestFrom(_ams5600_Address, 1);
-  while (Wire.available() == 0)
-    ;
-  int low = Wire.read();
-  
-  /* Read High Byte */
+  /* Read 2 Bytes */
   Wire.beginTransmission(_ams5600_Address);
   Wire.write(in_adr_hi);
   Wire.endTransmission();
-  Wire.requestFrom(_ams5600_Address, 1);
-
-  while (Wire.available() == 0)
+  Wire.requestFrom(_ams5600_Address, 2);
+  while (Wire.available() < 2)
     ;
-
-  word high = Wire.read();
   
-  high = high << 8;
-  retVal = high | low;
-
-  return retVal;
+  int high = Wire.read();
+  int low = Wire.read();
+  return ( high << 8 ) | low;
 }
 
 /*******************************************************
