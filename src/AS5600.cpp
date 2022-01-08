@@ -29,27 +29,23 @@ AMS_5600::AMS_5600()
   /* load register values */
   /* c++ class forbids pre loading of variables */
   _zmco = 0x00;
-  _zpos_hi = 0x01;
-  _zpos_lo = 0x02;
-  _mpos_hi = 0x03;
-  _mpos_lo = 0x04;
-  _mang_hi = 0x05;
-  _mang_lo = 0x06;
-  _conf_hi = 0x07;
-  _conf_lo = 0x08;
-  _raw_ang_hi = 0x0c;
-  _raw_ang_lo = 0x0d;
-  _ang_hi = 0x0e;
-  _ang_lo = 0x0f;
   _stat = 0x0b;
   _agc = 0x1a;
-  _mag_hi = 0x1b;
-  _mag_lo = 0x1c;
   _burn = 0xff;
+
+  _addr_zpos    = 0x01; // 0x02 - LSB
+  _addr_mpos    = 0x03; // 0x04 - LSB
+  _addr_mang     = 0x05; // 0x06 - LSB
+  _addr_conf    = 0x07; // 0x08 - LSB
+  _addr_raw_ang = 0x0c; // 0x0d - LSB
+  _addr_ang     = 0x0e; // 0x0f - LSB
+  _addr_mag     = 0x1b; // 0x1c - LSB
 }
+
 /* mode = 0, output PWM, mode = 1 output analog (full range from 0% to 100% between GND and VDD */
 void AMS_5600::setOutPut(uint8_t mode)
 {
+  int _conf_lo = _addr_conf+1; // lower byte address
   uint8_t config_status;
   config_status = readOneByte(_conf_lo);
   if (mode == 1)
@@ -71,6 +67,7 @@ void AMS_5600::setOutPut(uint8_t mode)
     writeOneByte(_conf_lo, lowByte(config_status));
   }
 }
+
 /****************************************************
   Method: AMS_5600
   In: none
@@ -101,12 +98,12 @@ word AMS_5600::setMaxAngle(word newMaxAngle)
   else
     _maxAngle = newMaxAngle;
 
-  writeOneByte(_mang_hi, highByte(_maxAngle));
+  writeOneByte(_addr_mang, highByte(_maxAngle));
   delay(2);
-  writeOneByte(_mang_lo, lowByte(_maxAngle));
+  writeOneByte(_addr_mang+1, lowByte(_maxAngle));
   delay(2);
 
-  retVal = readTwoBytes(_mang_hi, _mang_lo);
+  retVal = readTwoBytes(_addr_mang);
   return retVal;
 }
 
@@ -118,7 +115,7 @@ word AMS_5600::setMaxAngle(word newMaxAngle)
 *******************************************************/
 word AMS_5600::getMaxAngle()
 {
-  return readTwoBytes(_mang_hi, _mang_lo);
+  return readTwoBytes(_addr_mang);
 }
 
 /*******************************************************
@@ -138,11 +135,11 @@ word AMS_5600::setStartPosition(word startAngle)
   else
     _rawStartAngle = startAngle;
 
-  writeOneByte(_zpos_hi, highByte(_rawStartAngle));
+  writeOneByte(_addr_zpos, highByte(_rawStartAngle));
   delay(2);
-  writeOneByte(_zpos_lo, lowByte(_rawStartAngle));
+  writeOneByte(_addr_zpos+1, lowByte(_rawStartAngle));
   delay(2);
-  _zPosition = readTwoBytes(_zpos_hi, _zpos_lo);
+  _zPosition = readTwoBytes(_addr_zpos);
 
   return (_zPosition);
 }
@@ -155,7 +152,7 @@ word AMS_5600::setStartPosition(word startAngle)
 *******************************************************/
 word AMS_5600::getStartPosition()
 {
-  return readTwoBytes(_zpos_hi, _zpos_lo);
+  return readTwoBytes(_addr_zpos);
 }
 
 /*******************************************************
@@ -173,11 +170,11 @@ word AMS_5600::setEndPosition(word endAngle)
   else
     _rawEndAngle = endAngle;
 
-  writeOneByte(_mpos_hi, highByte(_rawEndAngle));
+  writeOneByte(_addr_mpos, highByte(_rawEndAngle));
   delay(2);
-  writeOneByte(_mpos_lo, lowByte(_rawEndAngle));
+  writeOneByte(_addr_mpos+1, lowByte(_rawEndAngle));
   delay(2);
-  _mPosition = readTwoBytes(_mpos_hi, _mpos_lo);
+  _mPosition = readTwoBytes(_addr_mpos);
 
   return (_mPosition);
 }
@@ -190,7 +187,7 @@ word AMS_5600::setEndPosition(word endAngle)
 *******************************************************/
 word AMS_5600::getEndPosition()
 {
-  word retVal = readTwoBytes(_mpos_hi, _mpos_lo);
+  word retVal = readTwoBytes(_addr_mpos);
   return retVal;
 }
 
@@ -203,7 +200,7 @@ word AMS_5600::getEndPosition()
 *******************************************************/
 word AMS_5600::getRawAngle()
 {
-  return readTwoBytes(_raw_ang_hi, _raw_ang_lo);
+  return readTwoBytes(_addr_raw_ang);
 }
 
 /*******************************************************
@@ -216,7 +213,7 @@ word AMS_5600::getRawAngle()
 *******************************************************/
 word AMS_5600::getScaledAngle()
 {
-  return readTwoBytes(_ang_hi, _ang_lo);
+  return readTwoBytes(_addr_ang);
 }
 
 /*******************************************************
@@ -291,7 +288,7 @@ int AMS_5600::getAgc()
 *******************************************************/
 word AMS_5600::getMagnitude()
 {
-  return readTwoBytes(_mag_hi, _mag_lo);
+  return readTwoBytes(_addr_mag);
 }
 
 /*******************************************************
@@ -302,7 +299,7 @@ word AMS_5600::getMagnitude()
 *******************************************************/
 word AMS_5600::getConf()
 {
-  return readTwoBytes(_conf_hi, _conf_lo);
+  return readTwoBytes(_addr_conf);
 }
 
 /*******************************************************
@@ -313,9 +310,9 @@ word AMS_5600::getConf()
 *******************************************************/
 void AMS_5600::setConf(word _conf)
 {
-  writeOneByte(_conf_hi, highByte(_conf));
+  writeOneByte(_addr_conf, highByte(_conf));
   delay(2);
-  writeOneByte(_conf_lo, lowByte(_conf));
+  writeOneByte(_addr_conf+1, lowByte(_conf));
   delay(2);
 }
 
@@ -419,11 +416,11 @@ int AMS_5600::readOneByte(int in_adr)
   Out: data read from i2c as a word
   Description: reads two bytes register from i2c
 *******************************************************/
-word AMS_5600::readTwoBytes(int in_adr_hi, int in_adr_lo)
+word AMS_5600::readTwoBytes(int addr_in)
 {
   /* Read 2 Bytes */
   Wire.beginTransmission(_ams5600_Address);
-  Wire.write(in_adr_hi);
+  Wire.write(addr_in);
   Wire.endTransmission();
   Wire.requestFrom(_ams5600_Address, 2);
   while (Wire.available() < 2)

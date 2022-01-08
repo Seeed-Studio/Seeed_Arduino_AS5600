@@ -57,26 +57,23 @@ private:
 
   /* Registers */
   int _zmco;
-  int _zpos_hi; /*zpos[11:8] high nibble  START POSITION */
-  int _zpos_lo; /*zpos[7:0] */
-  int _mpos_hi; /*mpos[11:8] high nibble  STOP POSITION */
-  int _mpos_lo; /*mpos[7:0] */
-  int _mang_hi; /*mang[11:8] high nibble  MAXIMUM ANGLE */
-  int _mang_lo; /*mang[7:0] */
-  int _conf_hi;
-  int _conf_lo;
-  int _raw_ang_hi;
-  int _raw_ang_lo;
-  int _ang_hi;
-  int _ang_lo;
   int _stat;
   int _agc;
-  int _mag_hi;
-  int _mag_lo;
   int _burn;
 
+  // specify starting address
+  // addr   = upper byte of data
+  // addr+1 = lower byte of data
+  int _addr_zpos; // only bits 0:3 of upper byte is used
+  int _addr_mpos; // only bits 0:3 of upper byte is used
+  int _addr_mang;  // only bits 0:3 of upper byte is used
+  int _addr_conf;
+  int _addr_raw_ang;
+  int _addr_ang;
+  int _addr_mag;
+
   int readOneByte(int in_adr);
-  word readTwoBytes(int in_adr_hi, int in_adr_lo);
+  word readTwoBytes(int addr_in);
   void writeOneByte(int adr_in, int dat_in);
 };
 #endif
