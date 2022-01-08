@@ -64,9 +64,9 @@ private:
   // specify starting address
   // addr   = upper byte of data
   // addr+1 = lower byte of data
-  int _addr_zpos; // only bits 0:3 of upper byte is used
-  int _addr_mpos; // only bits 0:3 of upper byte is used
-  int _addr_mang;  // only bits 0:3 of upper byte is used
+  int _addr_zpos;    // only bits 0:3 of upper byte is used
+  int _addr_mpos;    // only bits 0:3 of upper byte is used
+  int _addr_mang;    // only bits 0:3 of upper byte is used
   int _addr_conf;
   int _addr_raw_ang;
   int _addr_ang;
