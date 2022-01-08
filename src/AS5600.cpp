@@ -35,7 +35,7 @@ AMS_5600::AMS_5600()
 
   _addr_zpos    = 0x01; // 0x02 - LSB
   _addr_mpos    = 0x03; // 0x04 - LSB
-  _addr_mang     = 0x05; // 0x06 - LSB
+  _addr_mang    = 0x05; // 0x06 - LSB
   _addr_conf    = 0x07; // 0x08 - LSB
   _addr_raw_ang = 0x0c; // 0x0d - LSB
   _addr_ang     = 0x0e; // 0x0f - LSB
