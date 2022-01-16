@@ -11,6 +11,10 @@
   access the AMS 5600 “potuino” shield.
 ***************************************************/
 
+// updated jan 2022 by isc - read two bytes together
+
+// datasheet: https://ams.com/documents/20143/36005/AS5600_DS000365_5-00.pdf
+
 #ifndef AMS_5600_h
 #define AMS_5600_h
 
@@ -55,25 +59,28 @@ private:
   word _mPosition;
   word _maxAngle;
 
-  /* Registers */
-  int _zmco;
-  int _stat;
-  int _agc;
-  int _burn;
+  // single byte registers
+  int _addr_status; // magnet status
+  int _addr_agc;    // automatic gain control
+  int _addr_burn;   // permanent burning of configs (zpos, mpos, mang, conf)
+  int _addr_zmco;   // number of times zpos/mpos has been permanently burned
+                    // zpos/mpos can be permanently burned 3x
+                    // mang/conf can be burned only once
 
-  // specify starting address
-  // addr   = upper byte of data
-  // addr+1 = lower byte of data
-  int _addr_zpos;    // only bits 0:3 of upper byte is used
-  int _addr_mpos;    // only bits 0:3 of upper byte is used
-  int _addr_mang;    // only bits 0:3 of upper byte is used
-  int _addr_conf;
-  int _addr_raw_ang;
-  int _addr_ang;
-  int _addr_mag;
+  // double byte registers, specify starting address (lower addr, but higher byte data)
+  // addr   = upper byte of data (MSB), only bits 0:3 are used
+  // addr+1 = lower byte of data (LSB)
+  int _addr_zpos;      // zero position (start)
+  int _addr_mpos;      // maximum position (stop)
+  int _addr_mang;      // maximum angle
+  int _addr_conf;      // configuration
+  int _addr_raw_angle; // raw angle
+  int _addr_angle;     // mapped angle
+  int _addr_magnitude; // magnitude of internal CORDIC
 
   int readOneByte(int in_adr);
-  word readTwoBytes(int addr_in);
+  word readTwoBytesSeparately(int addr_in);
+  word readTwoBytesTogether(int addr_in);
   void writeOneByte(int adr_in, int dat_in);
 };
 #endif
