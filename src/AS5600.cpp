@@ -11,6 +11,10 @@
   access the AMS 5600 “potuino” shield.
 *****************************************************/
 
+// updated jan 2022 by isc - read two bytes together
+
+// datasheet: https://ams.com/documents/20143/36005/AS5600_DS000365_5-00.pdf
+
 #include "Arduino.h"
 #include "AS5600.h"
 #include "Wire.h"
@@ -23,54 +27,27 @@
 *****************************************************/
 AMS_5600::AMS_5600()
 {
-  /* set i2c address */
-  _ams5600_Address = 0x36;
-
-  /* load register values */
-  /* c++ class forbids pre loading of variables */
-  _zmco = 0x00;
-  _zpos_hi = 0x01;
-  _zpos_lo = 0x02;
-  _mpos_hi = 0x03;
-  _mpos_lo = 0x04;
-  _mang_hi = 0x05;
-  _mang_lo = 0x06;
-  _conf_hi = 0x07;
-  _conf_lo = 0x08;
-  _raw_ang_hi = 0x0c;
-  _raw_ang_lo = 0x0d;
-  _ang_hi = 0x0e;
-  _ang_lo = 0x0f;
-  _stat = 0x0b;
-  _agc = 0x1a;
-  _mag_hi = 0x1b;
-  _mag_lo = 0x1c;
-  _burn = 0xff;
 }
+
 /* mode = 0, output PWM, mode = 1 output analog (full range from 0% to 100% between GND and VDD */
 void AMS_5600::setOutPut(uint8_t mode)
 {
+  int _conf_lo = _addr_conf+1; // lower byte address
   uint8_t config_status;
   config_status = readOneByte(_conf_lo);
-  if (mode == 1)
-  {
+  if (mode == 1) {
     config_status = config_status & 0xcf;
-  }
-  else
-  {
+  } else {
     uint8_t config_status;
     config_status = readOneByte(_conf_lo);
     if (mode == 1)
-    {
       config_status = config_status & 0xcf;
-    }
     else
-    {
       config_status = config_status & 0xef;
-    }
     writeOneByte(_conf_lo, lowByte(config_status));
   }
 }
+
 /****************************************************
   Method: AMS_5600
   In: none
@@ -93,20 +70,18 @@ int AMS_5600::getAddress()
 *******************************************************/
 word AMS_5600::setMaxAngle(word newMaxAngle)
 {
-  word retVal;
+  word _maxAngle;
   if (newMaxAngle == -1)
-  {
     _maxAngle = getRawAngle();
-  }
   else
     _maxAngle = newMaxAngle;
 
-  writeOneByte(_mang_hi, highByte(_maxAngle));
+  writeOneByte(_addr_mang, highByte(_maxAngle));
   delay(2);
-  writeOneByte(_mang_lo, lowByte(_maxAngle));
+  writeOneByte(_addr_mang+1, lowByte(_maxAngle));
   delay(2);
 
-  retVal = readTwoBytes(_mang_hi, _mang_lo);
+  word retVal = readTwoBytesSeparately(_addr_mang);
   return retVal;
 }
 
@@ -118,7 +93,7 @@ word AMS_5600::setMaxAngle(word newMaxAngle)
 *******************************************************/
 word AMS_5600::getMaxAngle()
 {
-  return readTwoBytes(_mang_hi, _mang_lo);
+  return readTwoBytesSeparately(_addr_mang);
 }
 
 /*******************************************************
@@ -131,18 +106,17 @@ word AMS_5600::getMaxAngle()
 *******************************************************/
 word AMS_5600::setStartPosition(word startAngle)
 {
+  word _rawStartAngle;
   if (startAngle == -1)
-  {
     _rawStartAngle = getRawAngle();
-  }
   else
     _rawStartAngle = startAngle;
 
-  writeOneByte(_zpos_hi, highByte(_rawStartAngle));
+  writeOneByte(_addr_zpos, highByte(_rawStartAngle));
   delay(2);
-  writeOneByte(_zpos_lo, lowByte(_rawStartAngle));
+  writeOneByte(_addr_zpos+1, lowByte(_rawStartAngle));
   delay(2);
-  _zPosition = readTwoBytes(_zpos_hi, _zpos_lo);
+  word _zPosition = readTwoBytesSeparately(_addr_zpos);
 
   return (_zPosition);
 }
@@ -155,7 +129,7 @@ word AMS_5600::setStartPosition(word startAngle)
 *******************************************************/
 word AMS_5600::getStartPosition()
 {
-  return readTwoBytes(_zpos_hi, _zpos_lo);
+  return readTwoBytesSeparately(_addr_zpos);
 }
 
 /*******************************************************
@@ -168,16 +142,17 @@ word AMS_5600::getStartPosition()
 *******************************************************/
 word AMS_5600::setEndPosition(word endAngle)
 {
+  word _rawEndAngle;
   if (endAngle == -1)
     _rawEndAngle = getRawAngle();
   else
     _rawEndAngle = endAngle;
 
-  writeOneByte(_mpos_hi, highByte(_rawEndAngle));
+  writeOneByte(_addr_mpos, highByte(_rawEndAngle));
   delay(2);
-  writeOneByte(_mpos_lo, lowByte(_rawEndAngle));
+  writeOneByte(_addr_mpos+1, lowByte(_rawEndAngle));
   delay(2);
-  _mPosition = readTwoBytes(_mpos_hi, _mpos_lo);
+  word _mPosition = readTwoBytesSeparately(_addr_mpos);
 
   return (_mPosition);
 }
@@ -190,7 +165,7 @@ word AMS_5600::setEndPosition(word endAngle)
 *******************************************************/
 word AMS_5600::getEndPosition()
 {
-  word retVal = readTwoBytes(_mpos_hi, _mpos_lo);
+  word retVal = readTwoBytesSeparately(_addr_mpos);
   return retVal;
 }
 
@@ -203,7 +178,7 @@ word AMS_5600::getEndPosition()
 *******************************************************/
 word AMS_5600::getRawAngle()
 {
-  return readTwoBytes(_raw_ang_hi, _raw_ang_lo);
+  return readTwoBytesTogether(_addr_raw_angle);
 }
 
 /*******************************************************
@@ -216,7 +191,7 @@ word AMS_5600::getRawAngle()
 *******************************************************/
 word AMS_5600::getScaledAngle()
 {
-  return readTwoBytes(_ang_hi, _ang_lo);
+  return readTwoBytesTogether(_addr_angle);
 }
 
 /*******************************************************
@@ -234,7 +209,7 @@ int AMS_5600::detectMagnet()
   /* MD high = magnet detected*/
   /* ML high = AGC Maximum overflow, magnet to weak*/
   /* MH high = AGC minimum overflow, Magnet to strong*/
-  magStatus = readOneByte(_stat);
+  magStatus = readOneByte(_addr_status);
 
   if (magStatus & 0x20)
     retVal = 1;
@@ -259,14 +234,13 @@ int AMS_5600::getMagnetStrength()
   /* MD high = magnet detected */
   /* ML high = AGC Maximum overflow, magnet to weak*/
   /* MH high = AGC minimum overflow, Magnet to strong*/
-  magStatus = readOneByte(_stat);
-  if (detectMagnet() == 1)
-  {
-    retVal = 2; /*just right */
+  magStatus = readOneByte(_addr_status);
+  if (detectMagnet() == 1) {
+    retVal = 2; /* just right */
     if (magStatus & 0x10)
-      retVal = 1; /*to weak */
+      retVal = 1; /* too weak */
     else if (magStatus & 0x08)
-      retVal = 3; /*to strong */
+      retVal = 3; /* too strong */
   }
 
   return retVal;
@@ -280,7 +254,7 @@ int AMS_5600::getMagnetStrength()
 *******************************************************/
 int AMS_5600::getAgc()
 {
-  return readOneByte(_agc);
+  return readOneByte(_addr_agc);
 }
 
 /*******************************************************
@@ -291,7 +265,7 @@ int AMS_5600::getAgc()
 *******************************************************/
 word AMS_5600::getMagnitude()
 {
-  return readTwoBytes(_mag_hi, _mag_lo);
+  return readTwoBytesTogether(_addr_magnitude);
 }
 
 /*******************************************************
@@ -302,7 +276,7 @@ word AMS_5600::getMagnitude()
 *******************************************************/
 word AMS_5600::getConf()
 {
-  return readTwoBytes(_conf_hi, _conf_lo);
+  return readTwoBytesSeparately(_addr_conf);
 }
 
 /*******************************************************
@@ -313,9 +287,9 @@ word AMS_5600::getConf()
 *******************************************************/
 void AMS_5600::setConf(word _conf)
 {
-  writeOneByte(_conf_hi, highByte(_conf));
+  writeOneByte(_addr_conf, highByte(_conf));
   delay(2);
-  writeOneByte(_conf_lo, lowByte(_conf));
+  writeOneByte(_addr_conf+1, lowByte(_conf));
   delay(2);
 }
 
@@ -328,7 +302,7 @@ void AMS_5600::setConf(word _conf)
 *******************************************************/
 int AMS_5600::getBurnCount()
 {
-  return readOneByte(_zmco);
+  return readOneByte(_addr_zmco);
 }
 
 /*******************************************************
@@ -343,24 +317,21 @@ int AMS_5600::getBurnCount()
 *******************************************************/
 int AMS_5600::burnAngle()
 {
-  int retVal = 1;
-  _zPosition = getStartPosition();
-  _mPosition = getEndPosition();
-  _maxAngle = getMaxAngle();
+  word _zPosition = getStartPosition();
+  word _mPosition = getEndPosition();
+  word _maxAngle = getMaxAngle();
 
-  if (detectMagnet() == 1)
-  {
-    if (getBurnCount() < 3)
-    {
+  int retVal = 1;
+  if (detectMagnet() == 1) {
+    if (getBurnCount() < 3) {
       if ((_zPosition == 0) && (_mPosition == 0))
         retVal = -3;
       else
-        writeOneByte(_burn, 0x80);
+        writeOneByte(_addr_burn, 0x80);
     }
     else
       retVal = -2;
-  }
-  else
+  } else
     retVal = -1;
 
   return retVal;
@@ -377,15 +348,14 @@ int AMS_5600::burnAngle()
 *******************************************************/
 int AMS_5600::burnMaxAngleAndConfig()
 {
-  int retVal = 1;
-  _maxAngle = getMaxAngle();
+  word _maxAngle = getMaxAngle();
 
-  if (getBurnCount() == 0)
-  {
+  int retVal = 1;
+  if (getBurnCount() == 0) {
     if (_maxAngle * 0.087 < 18)
       retVal = -2;
     else
-      writeOneByte(_burn, 0x40);
+      writeOneByte(_addr_burn, 0x40);
   }
   else
     retVal = -1;
@@ -405,7 +375,7 @@ int AMS_5600::readOneByte(int in_adr)
   Wire.beginTransmission(_ams5600_Address);
   Wire.write(in_adr);
   Wire.endTransmission();
-  Wire.requestFrom(_ams5600_Address, 1);
+  Wire.requestFrom(_ams5600_Address, (uint8_t) 1);
   while (Wire.available() == 0)
     ;
   retVal = Wire.read();
@@ -419,19 +389,58 @@ int AMS_5600::readOneByte(int in_adr)
   Out: data read from i2c as a word
   Description: reads two bytes register from i2c
 *******************************************************/
-word AMS_5600::readTwoBytes(int in_adr_hi, int in_adr_lo)
+word AMS_5600::readTwoBytesTogether(int addr_in)
 {
+
+  // use only for Angle, Raw Angle and Magnitude
+
+  // read 2 bytes together to prevent getting inconsistent
+  //    data while the encoder is moving
+  // according to the datasheet the address is automatically incremented
+  //    but only for Angle, Raw Angle and Magnitude
+  // the title says it's auto, but the paragraph after it
+  //    says it does NOT
+  // tested and it does auto increment
+  
+  // PAGE 13: https://ams.com/documents/20143/36005/AS5600_DS000365_5-00.pdf
+  // Automatic Increment of the Address Pointer for ANGLE, RAW ANGLE and MAGNITUDE Registers
+  // These are special registers which suppress the automatic
+  // increment of the address pointer on reads, so a re-read of these
+  // registers requires no I²C write command to reload the address
+  // pointer. This special treatment of the pointer is effective only if
+  // the address pointer is set to the high byte of the register.
+
   /* Read 2 Bytes */
   Wire.beginTransmission(_ams5600_Address);
-  Wire.write(in_adr_hi);
+  Wire.write(addr_in);
   Wire.endTransmission();
-  Wire.requestFrom(_ams5600_Address, 2);
+  Wire.requestFrom(_ams5600_Address, (uint8_t) 2);
   while (Wire.available() < 2)
     ;
   
-  int high = Wire.read();
-  int low = Wire.read();
-  return ( high << 8 ) | low;
+  int highByte = Wire.read();
+  int lowByte  = Wire.read();
+
+  // in case newer version of IC used the same address to
+  //    store something else, get only the 3 bits
+  //return ( ( highByte & 0b111 ) << 8 ) | lowByte;
+
+  // but in case newer version has higher resolution
+  //    we're good to go
+  return ( highByte << 8 ) | lowByte;
+}
+
+/*******************************************************
+  Method: readTwoBytes
+  In: two registers to read
+  Out: data read from i2c as a word
+  Description: reads two bytes register from i2c
+*******************************************************/
+word AMS_5600::readTwoBytesSeparately(int addr_in)
+{
+  int highByte = readOneByte(addr_in  );
+  int lowByte  = readOneByte(addr_in+1);
+  return ( highByte << 8 ) | lowByte;
 }
 
 /*******************************************************
