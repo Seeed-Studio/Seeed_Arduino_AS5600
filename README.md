@@ -25,6 +25,17 @@ Number of burns remaining: 3
 98 - Burn Settings (one time)
 
 ```
+
+****Note: Check your custom board (Like this one: [Hall AS5600 sensor for Game Wheel 23x23mm](https://community.element14.com/challenges-projects/project14/sensors/b/blog/posts/hall-sensor-as5600-for-game-wheel)):****
+
+- If there is a pull-down resistor (1k) on pin 5 (PGO), internally there is already a pull-up resistor, there may be a conflict
+- If there is a jumper resistor (0R) between pins 1 (VDD5V) and 2 (VDD3V3), to work under 5V, you need to remove this jumper
+- AS5600 pin 8 (DIR) selects direction, needs to be set externally, otherwise the readings may fluctuate
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/8660811/156690600-3f53a42b-e3c1-4673-a931-47c065e79812.png" alt="aw Angle in Clockwise Direction "/>
+</p>
+
 ****Note: Rotate the magnet before use to make sure that the magnet is close to 0 and 360 through get raw angle****
 1. If you just need raw data, input `7`.  Its direction is based on [AS5600 datasheet](https://ams.com/documents/20143/36005/AS5600_DS000365_5-00.pdf/649ee61c-8f9a-20df-9e10-43173a3eb323) Figure 35: Raw Angle in Clockwise Direction 
 <p align="center">
