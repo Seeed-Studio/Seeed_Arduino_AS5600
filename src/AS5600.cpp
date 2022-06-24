@@ -319,7 +319,6 @@ int AMS_5600::burnAngle()
 {
   word _zPosition = getStartPosition();
   word _mPosition = getEndPosition();
-  word _maxAngle = getMaxAngle();
 
   int retVal = 1;
   if (detectMagnet() == 1) {
