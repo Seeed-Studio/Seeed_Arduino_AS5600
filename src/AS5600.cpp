@@ -29,23 +29,25 @@ AMS_5600::AMS_5600()
 {
 }
 
-/* mode = 0, output PWM, mode = 1 output analog (full range from 0% to 100% between GND and VDD */
+/*******************************************************
+  Method: setOutPut
+  In: 0 for digital PWM
+      1 for analog (full range 0-100% of GND to VDD)
+      2 for analog (reduced range 10-90%)
+  Out: none
+  Description: sets output mode in CONF register.
+*******************************************************/
 void AMS_5600::setOutPut(uint8_t mode)
 {
   int _conf_lo = _addr_conf+1; // lower byte address
-  uint8_t config_status;
-  config_status = readOneByte(_conf_lo);
-  if (mode == 1) {
-    config_status = config_status & 0xcf;
-  } else {
-    uint8_t config_status;
-    config_status = readOneByte(_conf_lo);
-    if (mode == 1)
-      config_status = config_status & 0xcf;
-    else
-      config_status = config_status & 0xef;
-    writeOneByte(_conf_lo, lowByte(config_status));
+  uint8_t config_status = readOneByte(_conf_lo);
+  config_status &= 0b11001111; // bits 5:4 = 00, default
+  if (mode == 0) {
+    config_status |= 0b100000; // bits 5:4 = 10
+  } else if (mode == 2) {
+    config_status |= 0b010000; // bits 5:4 = 01
   }
+  writeOneByte(_conf_lo, config_status);
 }
 
 /****************************************************
@@ -199,50 +201,42 @@ word AMS_5600::getScaledAngle()
   In: none
   Out: 1 if magnet is detected, 0 if not
   Description: reads status register and examines the 
-  MH bit
+  MD bit.
 *******************************************************/
 int AMS_5600::detectMagnet()
 {
-  int magStatus;
-  int retVal = 0;
-  /*0 0 MD ML MH 0 0 0*/
-  /* MD high = magnet detected*/
-  /* ML high = AGC Maximum overflow, magnet to weak*/
-  /* MH high = AGC minimum overflow, Magnet to strong*/
-  magStatus = readOneByte(_addr_status);
-
-  if (magStatus & 0x20)
-    retVal = 1;
-
-  return retVal;
+  // Status bits: 0 0 MD ML MH 0 0 0 
+  // MD high = magnet detected  
+  int magStatus = readOneByte(_addr_status);
+  return (magStatus & 0x20) ? 1 : 0;
 }
 
 /*******************************************************
   Method: getMagnetStrength
   In: none
-  Out: 0 if no magnet is detected
-       1 if magnet is to weak
+  Out: 0 if magnet not detected
+       1 if magnet is too weak
        2 if magnet is just right
-       3 if magnet is to strong
-  Description: reads status register andexamins the MH,ML,MD bits
+       3 if magnet is too strong
+  Description: reads status register and examines the 
+  MH,ML,MD bits.
 *******************************************************/
 int AMS_5600::getMagnetStrength()
 {
-  int magStatus;
-  int retVal = 0;
-  /*0 0 MD ML MH 0 0 0*/
-  /* MD high = magnet detected */
-  /* ML high = AGC Maximum overflow, magnet to weak*/
-  /* MH high = AGC minimum overflow, Magnet to strong*/
-  magStatus = readOneByte(_addr_status);
-  if (detectMagnet() == 1) {
-    retVal = 2; /* just right */
+  int retVal = 0; // no magnet
+  // Status bits: 0 0 MD ML MH 0 0 0 
+  // MD high = magnet detected  
+  // ML high = AGC maximum overflow, magnet too weak
+  // MH high = AGC minimum overflow, magnet too strong
+  int magStatus = readOneByte(_addr_status);
+  if (magStatus & 0x20) {
+    retVal = 2;   // magnet detected
     if (magStatus & 0x10)
-      retVal = 1; /* too weak */
+      retVal = 1; // too weak
     else if (magStatus & 0x08)
-      retVal = 3; /* too strong */
+      retVal = 3; // too strong
   }
-
+  
   return retVal;
 }
 
@@ -457,4 +451,4 @@ void AMS_5600::writeOneByte(int adr_in, int dat_in)
   Wire.endTransmission();
 }
 
-/**********  END OF AMS 5600 CALSS *****************/
+/**********  END OF AMS 5600 CLASS *****************/
