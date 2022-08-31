@@ -135,7 +135,7 @@ word AMS_5600::getStartPosition()
 }
 
 /*******************************************************
-  Method: setEndtPosition
+  Method: setEndPosition
   In: new end angle position
   Out: value of end position register
   Description: sets a value in end position register.
@@ -378,7 +378,7 @@ int AMS_5600::readOneByte(int in_adr)
 }
 
 /*******************************************************
-  Method: readTwoBytes
+  Method: readTwoBytesTogether
   In: two registers to read
   Out: data read from i2c as a word
   Description: reads two bytes register from i2c
@@ -425,7 +425,7 @@ word AMS_5600::readTwoBytesTogether(int addr_in)
 }
 
 /*******************************************************
-  Method: readTwoBytes
+  Method: readTwoBytesSeparately
   In: two registers to read
   Out: data read from i2c as a word
   Description: reads two bytes register from i2c
