@@ -40,8 +40,8 @@ void setup()
 /*******************************************************/
 float convertRawAngleToDegrees(word newAngle)
 {
-  /* Raw data reports 0 - 4095 segments, which is 0.087 of a degree */
-  float retVal = newAngle * 0.087;
+  /* Raw data reports 0 - 4095 segments, which is 0.087890625 of a degree */
+  float retVal = newAngle * 0.087890625;
   return retVal;
 }
 void loop()
