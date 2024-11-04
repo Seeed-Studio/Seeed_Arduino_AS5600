@@ -29,7 +29,7 @@ Number of burns remaining: 3
 ****Note: Check your custom board (Like this one: [Hall AS5600 sensor for Game Wheel 23x23mm](https://community.element14.com/challenges-projects/project14/sensors/b/blog/posts/hall-sensor-as5600-for-game-wheel)):****
 
 - If there is a pull-down resistor (1k) on pin 5 (PGO), internally there is already a pull-up resistor, there may be a conflict
-- If there is a jumper resistor (0R) between pins 1 (VDD5V) and 2 (VDD3V3), to work under 5V, you need to remove this jumper
+- If there is a jumper resistor (0R) between pins 1 (VDD5V) and 2 (VDD3V3), to work at 5V, you need to remove this jumper
 - AS5600 pin 8 (DIR) selects direction, needs to be set externally, otherwise the readings may fluctuate
 
 <p align="center">
