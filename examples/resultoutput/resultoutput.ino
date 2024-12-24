@@ -1,12 +1,13 @@
 #include <Wire.h>
 #include <AS5600.h>
+
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-  #define SERIAL SerialUSB
   #define SYS_VOL   3.3
 #else
-  #define SERIAL Serial
   #define SYS_VOL   5
 #endif
+
+#define SERIAL Serial
 
 AMS_5600 ams5600;
 

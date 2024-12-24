@@ -9,18 +9,18 @@ Version 1.00
 Description:  AS5600 "Potuino" demonstration application
 
 AMS5600 Programming Sketch
-/***************************************************/
+ ***************************************************/
 
 #include <Wire.h>
 #include "AS5600.h"
 
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-  #define SERIAL SerialUSB
   #define SYS_VOL   3.3
 #else
-  #define SERIAL Serial
   #define SYS_VOL   5
 #endif
+
+#define SERIAL Serial
 
 String lastResponse;
 String noMagnetStr = "Error: magnet not detected";
@@ -28,11 +28,11 @@ String noMagnetStr = "Error: magnet not detected";
 AMS_5600 ams5600;
 
 /*******************************************************
-/* function: setup
-/* In: none
-/* Out: none
-/* Description: called by system at startup
-/*******************************************************/
+ * function: setup
+ * In: none
+ * Out: none
+ * Description: called by system at startup
+ *******************************************************/
 void setup(){
  SERIAL.begin(115200);
  Wire.begin();
@@ -40,12 +40,12 @@ void setup(){
 }
 
 /*******************************************************
-/* function: printMenu
-/* In: none
-/* Out: none
-/* Description: prints menu options and result of last
-/* command
-/*******************************************************/
+ * function: printMenu
+ * In: none
+ * Out: none
+ * Description: prints menu options and result of last
+ * command
+ *******************************************************/
 void printMenu()
 {
   for(int i =0; i<20;i++)
@@ -70,12 +70,12 @@ void printMenu()
 }
 
 /*******************************************************
-/* Function: convertRawAngleToDegrees
-/* In: angle data from AMS_5600::getRawAngle
-/* Out: human readable degrees as float
-/* Description: takes the raw angle and calculates
-/* float value in degrees.
-/*******************************************************/
+ * Function: convertRawAngleToDegrees
+ * In: angle data from AMS_5600::getRawAngle
+ * Out: human readable degrees as float
+ * Description: takes the raw angle and calculates
+ * float value in degrees.
+ *******************************************************/
 float convertRawAngleToDegrees(word newAngle)
 {
   /* Raw data reports 0 - 4095 segments, which is 0.087 of a degree */
@@ -84,12 +84,12 @@ float convertRawAngleToDegrees(word newAngle)
 }
 
 /*******************************************************
-/* Function: convertScaledAngleToDegrees
-/* In: angle data from AMS_5600::getScaledAngle
-/* Out: human readable degrees as float
-/* Description: takes the scaled angle and calculates
-/* float value in degrees.
-/*******************************************************/
+ * Function: convertScaledAngleToDegrees
+ * In: angle data from AMS_5600::getScaledAngle
+ * Out: human readable degrees as float
+ * Description: takes the scaled angle and calculates
+ * float value in degrees.
+ *******************************************************/
 float convertScaledAngleToDegrees(word newAngle)
 {
   word startPos = ams5600.getStartPosition();
@@ -121,11 +121,11 @@ float convertScaledAngleToDegrees(word newAngle)
 }
 
 /*******************************************************
-/* Function: burnAngle
-/* In: none
-/* Out: human readable string of success or failure
-/* Description: attempts to burn angle data to AMS5600
-/*******************************************************/
+ * Function: burnAngle
+ * In: none
+ * Out: human readable string of success or failure
+ * Description: attempts to burn angle data to AMS5600
+ *******************************************************/
 String burnAngle()
 {
   int burnResult = ams5600.burnAngle();
@@ -153,12 +153,12 @@ String burnAngle()
 }
 
 /*******************************************************
-/* Function: burnMaxAngleAndConfig
-/* In: none
-/* Out: human readable string of sucess or failure
-/* Description: attempts to burn max angle and config data
-/* to AMS5600
-/*******************************************************/
+ * Function: burnMaxAngleAndConfig
+ * In: none
+ * Out: human readable string of sucess or failure
+ * Description: attempts to burn max angle and config data
+ * to AMS5600
+ *******************************************************/
 String burnMaxAngleAndConfig()
 {
   int burnResult = ams5600.burnMaxAngleAndConfig();
@@ -183,11 +183,11 @@ String burnMaxAngleAndConfig()
 }
 
 /*******************************************************
-/* Function: loop
-/* In: none
-/* Out: none
-/* Description: main program loop
-/*******************************************************/
+ * Function: loop
+ * In: none
+ * Out: none
+ * Description: main program loop
+ *******************************************************/
 void loop()
 {
 
